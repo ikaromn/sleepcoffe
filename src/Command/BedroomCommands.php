@@ -15,10 +15,40 @@ class BedroomCommands
         $entityManager->flush();
     }
 
+    /**
+     * @param $repository
+     * @param $roomNumber
+     * @return mixed
+     */
     public function getBedroom($repository, $roomNumber)
     {
         return $repository->findOneBy(
             ['roomNumber' => $roomNumber]
         );
+    }
+
+    /**
+     * @param $repository
+     * @return array
+     */
+    public function getBedroomList($repository)
+    {
+        $bedroomsList = $repository->findAll();
+        $bedroomArray = array();
+        $count = 0;
+
+        foreach ($bedroomsList as $bedroom) {
+            $bedroomArray[$count] = [
+                'name' => $bedroom->getName(),
+                'price' => $bedroom->getPrice(),
+                'capacity' => $bedroom->getCapacity(),
+                'diponible' => $bedroom->getDisponible(),
+                'roomNumber' => $bedroom->getRoomNumber()
+            ];
+
+            $count++;
+        }
+
+        return $bedroomArray;
     }
 }

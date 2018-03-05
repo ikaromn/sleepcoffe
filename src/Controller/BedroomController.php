@@ -86,4 +86,18 @@ class BedroomController extends Controller
 
         return $jsonResponse;
     }
+
+    /**
+     * @Route("/bedroom/list/", name="bedrooms_list")
+     */
+    public function listBedrooms()
+    {
+        $jsonResponse = New JsonResponse();
+        $repository = $this->getDoctrine()->getRepository(Bedroom::class);
+
+        $bedroomCommand = New BedroomCommands();
+        $jsonResponse->setData($bedroomCommand->getBedroomList($repository));
+
+        return $jsonResponse;
+    }
 }
