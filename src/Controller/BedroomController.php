@@ -12,19 +12,19 @@ use App\Entity\Bedroom;
 class BedroomController extends Controller
 {
     /**
-     * @Route("/bedroom", name="bedroom")
+     * @Route("/bedroom", name="bedroom", methods={"POST"})
      * @param Request $request
      * @return JsonResponse
      */
     public function createBedroom(Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
+
+        $requestContent = $request->getContent();
+        $jsonResponse = New JsonResponse();
+        $bedroomContext = json_decode($requestContent, true);
+
         try {
-
-            $requestContent = $request->getContent();
-            $jsonResponse = New JsonResponse();
-            $bedroomContext = json_decode($requestContent, true);
-            $entityManager = $this->getDoctrine()->getManager();
-
             $bedroom = New Bedroom();
             $bedroom->setName($bedroomContext['name']);
             $bedroom->setPrice($bedroomContext['price']);
@@ -40,8 +40,8 @@ class BedroomController extends Controller
         }
 
         try {
-            $createBedroom = New BedroomCommands();
-            $createBedroom->createNewBedroom($bedroom, $entityManager);
+            $createBedroom = New BedroomCommands($manager);
+            $createBedroom->createNewBedroom($bedroom);
 
             $jsonResponse->setStatusCode(204);
         } catch (\Exception $e) {
@@ -55,17 +55,17 @@ class BedroomController extends Controller
     }
 
     /**
-     * @Route("/bedroom/{roomNumber}", name="bedroom")
+     * @Route("/bedroom/{roomNumber}", name="bedroom_item", methods={"GET"})
      * @param int $roomNumber
      * @return JsonResponse
      */
     public function getBedroom($roomNumber)
     {
+        $manager = $this->getDoctrine()->getManager();
         $jsonResponse = New JsonResponse();
-        $repository = $this->getDoctrine()->getRepository(Bedroom::class);
 
-        $createBedroom = New BedroomCommands();
-        $bedroomObject = $createBedroom->getBedroom($repository, $roomNumber);
+        $createBedroom = New BedroomCommands($manager);
+        $bedroomObject = $createBedroom->getBedroom($roomNumber);
 
         if (!isset($bedroomObject)) {
             $errorContent['summary'] = 'Bedroom number invalid';
@@ -92,12 +92,40 @@ class BedroomController extends Controller
      */
     public function listBedrooms()
     {
+        $manager = $this->getDoctrine()->getManager();
         $jsonResponse = New JsonResponse();
-        $repository = $this->getDoctrine()->getRepository(Bedroom::class);
 
-        $bedroomCommand = New BedroomCommands();
-        $jsonResponse->setData($bedroomCommand->getBedroomList($repository));
+        $bedroomCommand = New BedroomCommands($manager);
+        $jsonResponse->setData($bedroomCommand->getBedroomList());
 
+        return $jsonResponse;
+    }
+
+    /**
+     * @Route("/bedroom/{bedroomId}", name="bedroom_update", methods={"PUT"})
+     * @param Request $request
+     * @param $bedroomId
+     * @return mixed
+     */
+    public function updateBedroom(Request $request, $bedroomId)
+    {
+        $manager = $this->getDoctrine()->getManager();
+        $jsonResponse = New JsonResponse();
+        $bedroomCommand = New BedroomCommands($manager);
+
+        $requestContent = $request->getContent();
+        $bedroomContext = json_decode($requestContent, true);
+
+        $bedroomObject = $manager->getRepository(Bedroom::class)->find($bedroomId);
+        $bedroomObject->setName($bedroomContext['name']);
+        $bedroomObject->setPrice($bedroomContext['price']);
+        $bedroomObject->setCapacity($bedroomContext['capacity']);
+        $bedroomObject->setDisponible($bedroomContext['disponible']);
+        $bedroomObject->setRoomNumber($bedroomContext['roomNumber']);
+
+        $bedroomCommand->updateBedroom($bedroomObject);
+
+        $jsonResponse->setData("Updated");
         return $jsonResponse;
     }
 }

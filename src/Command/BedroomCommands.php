@@ -8,32 +8,37 @@ class BedroomCommands
 {
     private $bedroom;
 
-    public function createNewBedroom(Bedroom $bedroom, $entityManager)
+    private $manager;
+
+    public function __construct($manager)
+    {
+        $this->manager = $manager;
+    }
+
+    public function createNewBedroom(Bedroom $bedroom)
     {
         $this->bedroom = $bedroom;
-        $entityManager->persist($this->bedroom);
-        $entityManager->flush();
+        $this->manager->persist($this->bedroom);
+        $this->manager->flush();
     }
 
     /**
-     * @param $repository
      * @param $roomNumber
      * @return mixed
      */
-    public function getBedroom($repository, $roomNumber)
+    public function getBedroom($roomNumber)
     {
-        return $repository->findOneBy(
+        return $this->manager->getRepository(Bedroom::class)->findOneBy(
             ['roomNumber' => $roomNumber]
         );
     }
 
     /**
-     * @param $repository
      * @return array
      */
-    public function getBedroomList($repository)
+    public function getBedroomList()
     {
-        $bedroomsList = $repository->findAll();
+        $bedroomsList = $this->manager->getRepository(Bedroom::class)->findAll();
         $bedroomArray = array();
         $count = 0;
 
@@ -50,5 +55,20 @@ class BedroomCommands
         }
 
         return $bedroomArray;
+    }
+
+    /**
+     * @param Bedroom $bedroom
+     */
+    public function updateBedroom(Bedroom $bedroom)
+    {
+        $bedroomObject = $this->manager->getRepository(Bedroom::class)->find($bedroom->getId());
+        $bedroomObject->setName($bedroom->getName());
+        $bedroomObject->setPrice($bedroom->getPrice());
+        $bedroomObject->setCapacity($bedroom->getCapacity());
+        $bedroomObject->setDisponible($bedroom->getDisponible());
+        $bedroomObject->setRoomNumber($bedroom->getRoomNumber());
+
+        $this->manager->flush();
     }
 }
