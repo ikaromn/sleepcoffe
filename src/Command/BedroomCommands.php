@@ -40,18 +40,16 @@ class BedroomCommands
     {
         $bedroomsList = $this->manager->getRepository(Bedroom::class)->findAll();
         $bedroomArray = array();
-        $count = 0;
 
         foreach ($bedroomsList as $bedroom) {
-            $bedroomArray[$count] = [
+            $bedroomArray[] = [
+                'id' => $bedroom->getId(),
                 'name' => $bedroom->getName(),
                 'price' => $bedroom->getPrice(),
                 'capacity' => $bedroom->getCapacity(),
                 'diponible' => $bedroom->getDisponible(),
-                'roomNumber' => $bedroom->getRoomNumber()
+                'roomNumber' => $bedroom->getRoomNumber(),
             ];
-
-            $count++;
         }
 
         return $bedroomArray;
@@ -69,6 +67,16 @@ class BedroomCommands
         $bedroomObject->setDisponible($bedroom->getDisponible());
         $bedroomObject->setRoomNumber($bedroom->getRoomNumber());
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @param $bedroomId
+     */
+    public function deleteBedroom($bedroomId)
+    {
+        $product = $this->manager->getRepository(Bedroom::class)->find($bedroomId);
+        $this->manager->remove($product);
         $this->manager->flush();
     }
 }

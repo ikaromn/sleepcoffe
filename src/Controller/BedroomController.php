@@ -88,7 +88,7 @@ class BedroomController extends Controller
     }
 
     /**
-     * @Route("/bedroom/list/", name="bedrooms_list")
+     * @Route("/bedroom/list/", name="bedrooms_list", methods={"GET"})
      */
     public function listBedrooms()
     {
@@ -97,7 +97,6 @@ class BedroomController extends Controller
 
         $bedroomCommand = New BedroomCommands($manager);
         $jsonResponse->setData($bedroomCommand->getBedroomList());
-
         return $jsonResponse;
     }
 
@@ -126,6 +125,34 @@ class BedroomController extends Controller
         $bedroomCommand->updateBedroom($bedroomObject);
 
         $jsonResponse->setData("Updated");
+        return $jsonResponse;
+    }
+
+    /**
+     * @Route("/bedroom/{bedroomId}", name="bedroom_delete", methods={"DELETE"})
+     * @param Request $request
+     * @param $bedroomId
+     * @return mixed
+     */
+    public function deleteBedroom(Request $request, $bedroomId)
+    {
+        $manager = $this->getDoctrine()->getManager();
+        $jsonResponse = New JsonResponse();
+
+        $bedroomCommand = New BedroomCommands($manager);
+
+        try{
+            $bedroomCommand->deleteBedroom($bedroomId);
+            $jsonResponse->setStatusCode(204);
+        } catch (\Exception $e) {
+            $errorContent['summary'] = 'Bedrom not found';
+            $errorContent['message'] = $e->getMessage();
+            $jsonResponse->setData($errorContent);
+            $jsonResponse->setStatusCode(422);
+
+            return $jsonResponse;
+        }
+
         return $jsonResponse;
     }
 }
