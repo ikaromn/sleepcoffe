@@ -1,0 +1,20 @@
+php:
+    build: docker/php/.
+    ports:
+        - "8000:8000"
+        - "80:80"
+        - "433:433"
+    volumes:
+        - .:/var/www/sleepcoffe
+    links:
+        - mysql
+
+mysql:
+    image: mariadb
+    ports:
+        - 3306:3306
+    volumes:
+        - "./.data/db:/var/lib/mysql"
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        TERM: linux
