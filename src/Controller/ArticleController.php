@@ -9,14 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 class ArticleController extends AbstractController
 {
     /**
-     * @Route("/")
-     */
-    public function homepage()
-    {
-        return new Response("Hello world!");
-    }
-
-    /**
      * @Route("/news/{slug}")
      */
     public function show($slug)

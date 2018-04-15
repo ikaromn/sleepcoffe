@@ -12,7 +12,21 @@ use App\Entity\Bedroom;
 class BedroomController extends Controller
 {
     /**
-     * @Route("/bedroom", name="bedroom", methods={"POST"})
+     * @Route("/", name="sleepcoffe_homepage")
+     */
+    public function index()
+    {
+        $responseRender = new JsonResponse();
+
+        return $responseRender->setData(
+            [
+                "Its working"
+            ]
+        );
+    }
+
+    /**
+     * @Route("/bedroom", name="bedroom_create", methods={"POST"})
      * @param Request $request
      * @return JsonResponse
      */
@@ -88,7 +102,7 @@ class BedroomController extends Controller
     }
 
     /**
-     * @Route("/bedroom/list/", name="bedrooms_list", methods={"GET"})
+     * @Route("/bedroom/list/", name="bedroom_list", methods={"GET"})
      */
     public function listBedrooms()
     {
@@ -103,7 +117,7 @@ class BedroomController extends Controller
     /**
      * @Route("/bedroom/{bedroomId}", name="bedroom_update", methods={"PUT"})
      * @param Request $request
-     * @param $bedroomId
+     * @param int $bedroomId
      * @return mixed
      */
     public function updateBedroom(Request $request, $bedroomId)
@@ -131,7 +145,7 @@ class BedroomController extends Controller
     /**
      * @Route("/bedroom/{bedroomId}", name="bedroom_delete", methods={"DELETE"})
      * @param Request $request
-     * @param $bedroomId
+     * @param int $bedroomId
      * @return mixed
      */
     public function deleteBedroom(Request $request, $bedroomId)
@@ -145,7 +159,7 @@ class BedroomController extends Controller
             $bedroomCommand->deleteBedroom($bedroomId);
             $jsonResponse->setStatusCode(204);
         } catch (\Exception $e) {
-            $errorContent['summary'] = 'Bedrom not found';
+            $errorContent['summary'] = 'Bedroom not found';
             $errorContent['message'] = $e->getMessage();
             $jsonResponse->setData($errorContent);
             $jsonResponse->setStatusCode(422);
